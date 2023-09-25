@@ -19,7 +19,7 @@ from .models import AllpowersBLEData
 
 AC_ON_DESCRIPTION = SensorEntityDescription(
     key="ac_on",
-    device_class=SensorDeviceClass.BATTERY,
+    device_class=SensorDeviceClass.POWER,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
     has_entity_name=True,
@@ -28,7 +28,7 @@ AC_ON_DESCRIPTION = SensorEntityDescription(
 
 DC_ON_DESCRIPTION = SensorEntityDescription(
     key="dc_on",
-    device_class=SensorDeviceClass.BATTERY,
+    device_class=SensorDeviceClass.POWER,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
     has_entity_name=True,
@@ -37,7 +37,7 @@ DC_ON_DESCRIPTION = SensorEntityDescription(
 
 LIGHT_ON_DESCRIPTION = SensorEntityDescription(
     key="light_on",
-    device_class=SensorDeviceClass.BATTERY,
+    device_class=SensorDeviceClass.POWER,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
     has_entity_name=True,
