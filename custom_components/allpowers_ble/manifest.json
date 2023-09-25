@@ -4,7 +4,10 @@
   "version": "0.0.1",
   "bluetooth": [
     {
-      "manufacturer_id": 1494
+      "local_name": "AP S*"
+    },
+    {  
+      "local_name": "Allpowers *"
     }
   ],
   "codeowners": ["@jinglemansweep"],
@@ -13,5 +16,5 @@
   "documentation": "https://github.com/jinglemansweep/hacs-allpowers",
   "integration_type": "device",
   "iot_class": "local_push",
-  "requirements": ["sonicare-bletb==0.0.8"]
+  "requirements": []
 }

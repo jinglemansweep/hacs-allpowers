@@ -62,7 +62,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
             allpowers_ble = AllpowersBLE(discovery_info.device)
             try:
-                pass
                 await allpowers_ble.initialise()
             except BLEAK_EXCEPTIONS:
                 errors["base"] = "cannot_connect"

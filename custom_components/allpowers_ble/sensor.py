@@ -6,7 +6,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, UnitOfTime
+from homeassistant.const import PERCENTAGE, POWER_WATT, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import DeviceInfo
@@ -17,7 +17,34 @@ from . import AllpowersBLE, AllpowersBLECoordinator
 from .const import DOMAIN
 from .models import AllpowersBLEData
 
-BATTERY_LEVEL_DESCRIPTION = SensorEntityDescription(
+AC_ON_DESCRIPTION = SensorEntityDescription(
+    key="ac_on",
+    device_class=SensorDeviceClass.BATTERY,
+    entity_registry_enabled_default=True,
+    entity_registry_visible_default=True,
+    has_entity_name=True,
+    name="AC Power On",
+)
+
+DC_ON_DESCRIPTION = SensorEntityDescription(
+    key="dc_on",
+    device_class=SensorDeviceClass.BATTERY,
+    entity_registry_enabled_default=True,
+    entity_registry_visible_default=True,
+    has_entity_name=True,
+    name="DC Power On",
+)
+
+LIGHT_ON_DESCRIPTION = SensorEntityDescription(
+    key="light_on",
+    device_class=SensorDeviceClass.BATTERY,
+    entity_registry_enabled_default=True,
+    entity_registry_visible_default=True,
+    has_entity_name=True,
+    name="Light On",
+)
+
+PERCENT_REMAIN_DESCRIPTION = SensorEntityDescription(
     key="percent_remain",
     device_class=SensorDeviceClass.BATTERY,
     entity_registry_enabled_default=True,
@@ -28,8 +55,47 @@ BATTERY_LEVEL_DESCRIPTION = SensorEntityDescription(
     state_class=SensorStateClass.MEASUREMENT,
 )
 
+MINUTES_REMAIN_DESCRIPTION = SensorEntityDescription(
+    key="minutes_remain",
+    device_class=SensorDeviceClass.BATTERY,
+    entity_registry_enabled_default=True,
+    entity_registry_visible_default=True,
+    has_entity_name=True,
+    name="Battery Time Remaining",
+    native_unit_of_measurement=UnitOfTime.MINUTES,
+    state_class=SensorStateClass.MEASUREMENT,
+)
+
+WATTS_IMPORT_DESCRIPTION = SensorEntityDescription(
+    key="watts_import",
+    device_class=SensorDeviceClass.BATTERY,
+    entity_registry_enabled_default=True,
+    entity_registry_visible_default=True,
+    has_entity_name=True,
+    name="Battery Watts Import",
+    native_unit_of_measurement=POWER_WATT,
+    state_class=SensorStateClass.MEASUREMENT,
+)
+
+WATTS_EXPORT_DESCRIPTION = SensorEntityDescription(
+    key="watts_export",
+    device_class=SensorDeviceClass.BATTERY,
+    entity_registry_enabled_default=True,
+    entity_registry_visible_default=True,
+    has_entity_name=True,
+    name="Battery Watts Export",
+    native_unit_of_measurement=POWER_WATT,
+    state_class=SensorStateClass.MEASUREMENT,
+)
+
 SENSOR_DESCRIPTIONS = [
-    BATTERY_LEVEL_DESCRIPTION,
+    AC_ON_DESCRIPTION,
+    DC_ON_DESCRIPTION,
+    LIGHT_ON_DESCRIPTION,
+    PERCENT_REMAIN_DESCRIPTION,
+    MINUTES_REMAIN_DESCRIPTION,
+    WATTS_IMPORT_DESCRIPTION,
+    WATTS_EXPORT_DESCRIPTION,
 ]
 
 
