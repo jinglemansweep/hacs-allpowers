@@ -1,7 +1,6 @@
 import logging
 from bleak_retry_connector import BleakError, get_device
 
-# from sonicare_bletb import SonicareBLETB
 from homeassistant.components import bluetooth
 from homeassistant.components.bluetooth.match import ADDRESS, BluetoothCallbackMatcher
 from homeassistant.config_entries import ConfigEntry
@@ -9,6 +8,7 @@ from homeassistant.const import CONF_ADDRESS, EVENT_HOMEASSISTANT_STOP, Platform
 from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
 
+from .allpowers import AllpowersBLE
 from .const import DOMAIN
 from .coordinator import AllpowersBLECoordinator
 from .models import AllpowersBLEData
@@ -28,11 +28,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         raise ConfigEntryNotReady(
             f"Could not find Allpowers BLE battery device with address {address}"
         )
-    # sonicare_ble = SonicareBLETB(ble_device)
-    # coordinator = SonicareBLETBCoordinator(hass, sonicare_ble)
+    allpowers_ble = AllpowersBLE(ble_device)
+    coordinator = AllpowersBLECoordinator(hass, allpowers_ble)
 
     try:
-        # await sonicare_ble.initialise()
+        await allpowers_ble.initialise()
         pass
     except BleakError as exc:
         raise ConfigEntryNotReady(
@@ -46,7 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     ) -> None:
         """Update from a BLE callback"""
         _LOGGER.warning("_async_update_ble")
-        sonicare_ble.set_ble_device_and_advertisement_data(
+        allpowers_ble.set_ble_device_and_advertisement_data(
             service_info.device, service_info.advertisement
         )
 
@@ -60,7 +60,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = AllpowersBLEData(
-        entry.title, sonicare_ble, coordinator
+        entry.title, allpowers_ble, coordinator
     )
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -68,7 +68,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def _async_stop(event: Event) -> None:
         """Close the connection."""
-        await sonicare_ble.stop()
+        await allpowers_ble.stop()
 
     entry.async_on_unload(
         hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STOP, _async_stop)

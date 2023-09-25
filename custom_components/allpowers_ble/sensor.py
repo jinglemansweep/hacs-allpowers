@@ -13,7 +13,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from . import SonicareBLETB, AllpowersBLECoordinator
+from . import AllpowersBLE, AllpowersBLECoordinator
 from .const import DOMAIN
 from .models import AllpowersBLEData
 
@@ -59,7 +59,7 @@ class AllpowersBLESensor(
     def __init__(
         self,
         coordinator: AllpowersBLECoordinator,
-        device: SonicareBLETB,
+        device: AllpowersBLE,
         name: str,
         description: SensorEntityDescription,
     ) -> None:

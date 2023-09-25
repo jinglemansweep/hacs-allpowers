@@ -1,8 +1,8 @@
 import logging
 
-# from sonicare_bletb import SonicareBLETB, SonicareBLETBState
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from .allpowers import AllpowersBLE, AllpowersState
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -11,20 +11,20 @@ _LOGGER = logging.getLogger(__name__)
 class AllpowersBLECoordinator(DataUpdateCoordinator[None]):
     """Data coordinator for receiving updates from Allpowers BLE battery"""
 
-    def __init__(self, hass: HomeAssistant, sonicare_ble: SonicareBLETB) -> None:
+    def __init__(self, hass: HomeAssistant, allpowers_ble: AllpowersBLE) -> None:
         """Initialise the coordinator."""
         super().__init__(
             hass,
             _LOGGER,
             name=DOMAIN,
         )
-        self._sonicare_ble = sonicare_ble
-        sonicare_ble.register_callback(self._async_handle_update)
-        sonicare_ble.register_disconnected_callback(self._async_handle_disconnect)
+        self._allpowers_ble = allpowers_ble
+        allpowers_ble.register_callback(self._async_handle_update)
+        allpowers_ble.register_disconnected_callback(self._async_handle_disconnect)
         self.connected = True
 
     @callback
-    def _async_handle_update(self, state: SonicareBLETBState) -> None:
+    def _async_handle_update(self, state: AllpowersState) -> None:
         """Just trigger the callbacks."""
         _LOGGER.warning("_async_handle_update")
         self.connected = True

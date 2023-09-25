@@ -3,7 +3,6 @@ import logging
 from typing import Any
 from bluetooth_data_tools import human_readable_name
 
-# from sonicare_bletb import BLEAK_EXCEPTIONS, SonicareBLETB
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -15,6 +14,7 @@ from homeassistant.const import CONF_ADDRESS
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import DOMAIN, LOCAL_NAMES
+from .allpowers import AllpowersBLE
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -57,17 +57,17 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 discovery_info.address, raise_on_progress=False
             )
             self._abort_if_unique_id_configured()
-            # sonicare_ble = SonicareBLETB(discovery_info.device)
+            allpowers_ble = AllpowersBLE(discovery_info.device)
             try:
                 pass
-                # await sonicare_ble.initialise()
+                await allpowers_ble.initialise()
             except BLEAK_EXCEPTIONS:
                 errors["base"] = "cannot_connect"
             except Exception:  # pylint: disable=broad-except
                 _LOGGER.exception("Unexpected error")
                 errors["base"] = "unknown"
             else:
-                await sonicare_ble.stop()
+                await allpowers_ble.stop()
                 return self.async_create_entry(
                     title=local_name,
                     data={
