@@ -2,6 +2,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 from bluetooth_data_tools import human_readable_name
+from bleak_retry_connector import BLEAK_RETRY_EXCEPTIONS as BLEAK_EXCEPTIONS
 
 import voluptuous as vol
 
@@ -10,11 +11,13 @@ from homeassistant.components.bluetooth import (
     BluetoothServiceInfoBleak,
     async_discovered_service_info,
 )
+
 from homeassistant.const import CONF_ADDRESS
 from homeassistant.data_entry_flow import FlowResult
 
-from .const import DOMAIN, LOCAL_NAMES
 from .allpowers import AllpowersBLE
+from .const import DOMAIN, LOCAL_NAMES
+
 
 _LOGGER = logging.getLogger(__name__)
 

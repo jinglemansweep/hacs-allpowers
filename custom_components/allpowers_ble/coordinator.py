@@ -28,6 +28,7 @@ class AllpowersBLECoordinator(DataUpdateCoordinator[None]):
         """Just trigger the callbacks."""
         _LOGGER.warning("_async_handle_update")
         self.connected = True
+        # _LOGGER.info("state", state)
         self.async_set_updated_data(None)
 
     @callback

@@ -18,12 +18,12 @@ from .const import DOMAIN
 from .models import AllpowersBLEData
 
 BATTERY_LEVEL_DESCRIPTION = SensorEntityDescription(
-    key="battery_level",
+    key="percent_remain",
     device_class=SensorDeviceClass.BATTERY,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
     has_entity_name=True,
-    name="Battery level",
+    name="Battery Percentage Remaining",
     native_unit_of_measurement=PERCENTAGE,
     state_class=SensorStateClass.MEASUREMENT,
 )

@@ -1,8 +1,11 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from .allpowers import AllpowersBLE
-from .coordinator import AllpowersBLECoordinator
+
+if TYPE_CHECKING:
+    from .allpowers import AllpowersBLE
+    from .coordinator import AllpowersBLECoordinator
 
 
 @dataclass
