@@ -1,0 +1,23 @@
+{
+  "domain": "allpowers_ble",
+  "name": "Allpowers BLE Battery",
+  "version": "0.0.1",
+  "bluetooth": [
+    {
+      "manufacturer_id": 477
+    },
+    {
+      "service_uuid": "477ea600-a260-11e4-ae37-0002a5d50001"
+    },
+    {
+      "local_name": "Allpowers"
+    }
+  ],
+  "codeowners": ["@jinglemansweep"],
+  "config_flow": true,
+  "dependencies": ["bluetooth_adapters"],
+  "documentation": "https://github.com/jinglemansweep/hacs-allpowers",
+  "integration_type": "device",
+  "iot_class": "local_push",
+  "requirements": ["sonicare-bletb==0.0.8"]
+}
