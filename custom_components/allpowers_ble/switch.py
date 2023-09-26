@@ -16,8 +16,10 @@ from . import AllpowersBLE, AllpowersBLECoordinator
 from .const import DOMAIN
 from .models import AllpowersBLEData
 
+from typing import Dict, Any
+
 AC_SWITCH_DESCRIPTION = SwitchEntityDescription(
-    key="set_ac",
+    key="ac",
     device_class=SwitchDeviceClass.OUTLET,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
@@ -26,7 +28,7 @@ AC_SWITCH_DESCRIPTION = SwitchEntityDescription(
 )
 
 DC_SWITCH_DESCRIPTION = SwitchEntityDescription(
-    key="set_dc",
+    key="dc",
     device_class=SwitchDeviceClass.OUTLET,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
@@ -35,7 +37,7 @@ DC_SWITCH_DESCRIPTION = SwitchEntityDescription(
 )
 
 TORCH_SWITCH_DESCRIPTION = SwitchEntityDescription(
-    key="set_torch",
+    key="torch",
     device_class=SwitchDeviceClass.SWITCH,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
@@ -84,6 +86,8 @@ class AllpowersBLESwitch(
         super().__init__(coordinator)
         self._coordinator = coordinator
         self._device = device
+        self._attr_is_on = False
+        self._last_action = None
         self._key = description.key
         self.entity_description = description
         self._attr_unique_id = f"{device.address}_{self._key}"
@@ -91,6 +95,7 @@ class AllpowersBLESwitch(
             name=name,
             connections={(dr.CONNECTION_BLUETOOTH, device.address)},
         )
+        self._icon = "mdi:light-switch"
 
     async def async_added_to_hass(self) -> None:
         """Run when entity about to be added."""
@@ -103,9 +108,11 @@ class AllpowersBLESwitch(
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn entity off"""
-        if self._key not in ["set_ac", "set_dc", "set_torch"]:
+        if self._key not in ["ac", "dc", "torch"]:
             return
-        self._last_run_success = bool(await getattr(self._device, self._key)(False))
+        self._last_run_success = bool(
+            await getattr(self._device, f"set_{self._key}")(False)
+        )
         if self._last_run_success:
             self._attr_is_on = False
             self._last_action = "Off"
@@ -113,9 +120,11 @@ class AllpowersBLESwitch(
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn entity off"""
-        if self._key not in ["set_ac", "set_dc", "set_torch"]:
+        if self._key not in ["ac", "dc", "torch"]:
             return
-        self._last_run_success = bool(await getattr(self._device, self._key)(True))
+        self._last_run_success = bool(
+            await getattr(self._device, f"set_{self._key}")(True)
+        )
         if self._last_run_success:
             self._attr_is_on = False
             self._last_action = "On"
@@ -124,7 +133,6 @@ class AllpowersBLESwitch(
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator"""
-        self._attr_native_value = getattr(self._device, self._key)
         self.async_write_ha_state()
 
     @property
@@ -133,5 +141,23 @@ class AllpowersBLESwitch(
         return True
 
     @property
+    def is_on(self) -> bool | None:
+        """Return true if device is on"""
+        if self._key == "ac":
+            return self._device.ac_on
+        elif self._key == "dc":
+            return self._device.dc_on
+        elif self._key == "torch":
+            return self._device.light_on
+        else:
+            return False
+
+    @property
     def assumed_state(self) -> bool:
-        return not self._coordinator.connected
+        """Returns the last known state if unable to access real state of entity"""
+        return self._last_action == "On"
+
+    @property
+    def extra_state_attributes(self) -> Dict[str, Any]:
+        """Return the state attributes"""
+        return {"last_action": self._last_action}
