@@ -29,6 +29,7 @@ WrapFuncType = TypeVar("WrapFuncType", bound=Callable[..., Any])
 RETRY_BACKOFF_EXCEPTIONS = (BleakDBusError,)
 
 _LOGGER = logging.getLogger(__name__)
+_LOGGER.setLevel(logging.WARN)
 
 DEFAULT_ATTEMPTS = sys.maxsize
 
@@ -166,7 +167,7 @@ class AllpowersBLE:
 
     async def stop(self) -> None:
         """Stop the Allpowers BLE."""
-        _LOGGER.debug("%s: Stop", self.name)
+        # _LOGGER.debug("%s: Stop", self.name)
         await self._execute_disconnect()
 
     def _fire_callbacks(self) -> None:
@@ -203,10 +204,10 @@ class AllpowersBLE:
 
     async def initialise(self) -> None:
         """Initialize the device."""
-        _LOGGER.debug("%s: Sending configuration commands", self.name)
+        # _LOGGER.debug("%s: Sending configuration commands", self.name)
         await self._ensure_connected()
 
-        _LOGGER.debug("%s: Subscribe to notifications; RSSI: %s", self.name, self.rssi)
+        # _LOGGER.debug("%s: Subscribe to notifications; RSSI: %s", self.name, self.rssi)
         if self._client is not None:
             await self._client.start_notify(
                 CHARACTERISTIC_NOTIFY, self._notification_handler

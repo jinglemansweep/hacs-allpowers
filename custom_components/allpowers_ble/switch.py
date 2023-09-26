@@ -1,12 +1,11 @@
-from homeassistant.components.sensor import (
-    SensorDeviceClass,
-    SensorEntity,
-    SensorEntityDescription,
-    SensorStateClass,
+from homeassistant.components.switch import (
+    SwitchDeviceClass,
+    SwitchEntity,
+    SwitchEntityDescription,
 )
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, POWER_WATT, UnitOfTime
+from homeassistant.const import STATE_ON, PERCENTAGE, POWER_WATT, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import DeviceInfo
@@ -17,55 +16,37 @@ from . import AllpowersBLE, AllpowersBLECoordinator
 from .const import DOMAIN
 from .models import AllpowersBLEData
 
-PERCENT_REMAIN_DESCRIPTION = SensorEntityDescription(
-    key="percent_remain",
-    device_class=SensorDeviceClass.BATTERY,
+AC_SWITCH_DESCRIPTION = SwitchEntityDescription(
+    key="set_ac",
+    device_class=SwitchDeviceClass.OUTLET,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
     has_entity_name=True,
-    name="Remaining Charge",
-    native_unit_of_measurement=PERCENTAGE,
-    state_class=SensorStateClass.MEASUREMENT,
+    name="AC",
 )
 
-MINUTES_REMAIN_DESCRIPTION = SensorEntityDescription(
-    key="minutes_remain",
-    device_class=SensorDeviceClass.DURATION,
+DC_SWITCH_DESCRIPTION = SwitchEntityDescription(
+    key="set_dc",
+    device_class=SwitchDeviceClass.OUTLET,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
     has_entity_name=True,
-    name="Remaining Time",
-    native_unit_of_measurement=UnitOfTime.MINUTES,
-    state_class=SensorStateClass.MEASUREMENT,
+    name="DC",
 )
 
-WATTS_IMPORT_DESCRIPTION = SensorEntityDescription(
-    key="watts_import",
-    device_class=SensorDeviceClass.POWER,
+TORCH_SWITCH_DESCRIPTION = SwitchEntityDescription(
+    key="set_torch",
+    device_class=SwitchDeviceClass.SWITCH,
     entity_registry_enabled_default=True,
     entity_registry_visible_default=True,
     has_entity_name=True,
-    name="Battery Watts Import",
-    native_unit_of_measurement=POWER_WATT,
-    state_class=SensorStateClass.MEASUREMENT,
+    name="Light",
 )
 
-WATTS_EXPORT_DESCRIPTION = SensorEntityDescription(
-    key="watts_export",
-    device_class=SensorDeviceClass.POWER,
-    entity_registry_enabled_default=True,
-    entity_registry_visible_default=True,
-    has_entity_name=True,
-    name="Battery Watts Export",
-    native_unit_of_measurement=POWER_WATT,
-    state_class=SensorStateClass.MEASUREMENT,
-)
-
-SENSOR_DESCRIPTIONS = [
-    PERCENT_REMAIN_DESCRIPTION,
-    MINUTES_REMAIN_DESCRIPTION,
-    WATTS_IMPORT_DESCRIPTION,
-    WATTS_EXPORT_DESCRIPTION,
+SWITCH_DESCRIPTIONS = [
+    AC_SWITCH_DESCRIPTION,
+    DC_SWITCH_DESCRIPTION,
+    TORCH_SWITCH_DESCRIPTION,
 ]
 
 
@@ -77,29 +58,29 @@ async def async_setup_entry(
     """Set up the platform for Allpowers BLE"""
     data: AllpowersBLEData = hass.data[DOMAIN][entry.entry_id]
     async_add_entities(
-        AllpowersBLESensor(
+        AllpowersBLESwitch(
             data.coordinator,
             data.device,
             entry.title,
             description,
         )
-        for description in SENSOR_DESCRIPTIONS
+        for description in SWITCH_DESCRIPTIONS
     )
 
 
-class AllpowersBLESensor(
-    CoordinatorEntity[AllpowersBLECoordinator], SensorEntity, RestoreEntity
+class AllpowersBLESwitch(
+    CoordinatorEntity[AllpowersBLECoordinator], SwitchEntity, RestoreEntity
 ):
-    """Generic sensor for Allpowers BLE"""
+    """Generic switch for Allpowers BLE"""
 
     def __init__(
         self,
         coordinator: AllpowersBLECoordinator,
         device: AllpowersBLE,
         name: str,
-        description: SensorEntityDescription,
+        description: SwitchEntityDescription,
     ) -> None:
-        """Initialize the sensor."""
+        """Initialize switch"""
         super().__init__(coordinator)
         self._coordinator = coordinator
         self._device = device
@@ -112,10 +93,33 @@ class AllpowersBLESensor(
         )
 
     async def async_added_to_hass(self) -> None:
+        """Run when entity about to be added."""
         await super().async_added_to_hass()
         if not (last_state := await self.async_get_last_state()):
             return
-        self._attr_native_value = last_state.state
+        self._attr_is_on = last_state.state == STATE_ON
+        if "last_run_success" in last_state.attributes:
+            self._last_run_success = last_state.attributes["last_run_success"]
+
+    async def async_turn_off(self, **kwargs) -> None:
+        """Turn entity off"""
+        if self._key not in ["set_ac", "set_dc", "set_torch"]:
+            return
+        self._last_run_success = bool(await getattr(self._device, self._key)(False))
+        if self._last_run_success:
+            self._attr_is_on = False
+            self._last_action = "Off"
+        self.async_write_ha_state()
+
+    async def async_turn_on(self, **kwargs) -> None:
+        """Turn entity off"""
+        if self._key not in ["set_ac", "set_dc", "set_torch"]:
+            return
+        self._last_run_success = bool(await getattr(self._device, self._key)(True))
+        if self._last_run_success:
+            self._attr_is_on = False
+            self._last_action = "On"
+        self.async_write_ha_state()
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -131,7 +135,3 @@ class AllpowersBLESensor(
     @property
     def assumed_state(self) -> bool:
         return not self._coordinator.connected
-
-    @property
-    def native_value(self) -> str | int | None:
-        return getattr(self._device, self._key)

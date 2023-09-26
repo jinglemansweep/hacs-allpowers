@@ -26,7 +26,7 @@ class AllpowersBLECoordinator(DataUpdateCoordinator[None]):
     @callback
     def _async_handle_update(self, state: AllpowersState) -> None:
         """Just trigger the callbacks."""
-        _LOGGER.warning("_async_handle_update")
+        # _LOGGER.warning("_async_handle_update")
         self.connected = True
         # _LOGGER.info("state", state)
         self.async_set_updated_data(None)
@@ -34,6 +34,6 @@ class AllpowersBLECoordinator(DataUpdateCoordinator[None]):
     @callback
     def _async_handle_disconnect(self) -> None:
         """Trigger the callbacks for disconnected."""
-        _LOGGER.warning("_async_handle_disconnect")
+        # _LOGGER.warning("_async_handle_disconnect")
         self.connected = False
         self.async_update_listeners()
