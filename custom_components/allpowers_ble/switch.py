@@ -5,7 +5,7 @@ from homeassistant.components.switch import (
 )
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import STATE_ON, PERCENTAGE, POWER_WATT, UnitOfTime
+from homeassistant.const import STATE_ON, PERCENTAGE, UnitOfPower, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import DeviceInfo

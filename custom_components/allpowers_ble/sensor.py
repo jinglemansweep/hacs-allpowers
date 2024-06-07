@@ -6,7 +6,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE, POWER_WATT, UnitOfTime
+from homeassistant.const import PERCENTAGE, UnitOfPower, UnitOfTime
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity import DeviceInfo
@@ -46,7 +46,7 @@ WATTS_IMPORT_DESCRIPTION = SensorEntityDescription(
     entity_registry_visible_default=True,
     has_entity_name=True,
     name="Battery Watts Import",
-    native_unit_of_measurement=POWER_WATT,
+    native_unit_of_measurement=UnitOfPower.WATT,
     state_class=SensorStateClass.MEASUREMENT,
 )
 
@@ -57,7 +57,7 @@ WATTS_EXPORT_DESCRIPTION = SensorEntityDescription(
     entity_registry_visible_default=True,
     has_entity_name=True,
     name="Battery Watts Export",
-    native_unit_of_measurement=POWER_WATT,
+    native_unit_of_measurement=UnitOfPower.WATT,
     state_class=SensorStateClass.MEASUREMENT,
 )
 
