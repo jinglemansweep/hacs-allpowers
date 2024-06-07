@@ -260,25 +260,26 @@ class AllpowersBLE:
 
         self._buf += data
 
-        battery_percentage = data[8]
-        dc_on = data[7] >> 0 & 1 == 1
-        ac_on = data[7] >> 1 & 1 == 1
-        torch_on = data[7] >> 4 & 1 == 1
-        output_power = (256 * data[11]) + data[12]
-        input_power = (256 * data[9]) + data[10]
-        minutes_remaining = (256 * data[13]) + data[14]
+        if len(data) > 14:
+            battery_percentage = data[8]
+            dc_on = data[7] >> 0 & 1 == 1
+            ac_on = data[7] >> 1 & 1 == 1
+            torch_on = data[7] >> 4 & 1 == 1
+            output_power = (256 * data[11]) + data[12]
+            input_power = (256 * data[9]) + data[10]
+            minutes_remaining = (256 * data[13]) + data[14]
 
-        self._state = AllpowersState(
-            ac_on=ac_on,
-            dc_on=dc_on,
-            light_on=torch_on,
-            percent_remain=battery_percentage,
-            minutes_remain=minutes_remaining,
-            watts_export=output_power,
-            watts_import=input_power,
-        )
+            self._state = AllpowersState(
+                ac_on=ac_on,
+                dc_on=dc_on,
+                light_on=torch_on,
+                percent_remain=battery_percentage,
+                minutes_remain=minutes_remaining,
+                watts_export=output_power,
+                watts_import=input_power,
+            )
 
-        self._fire_callbacks()
+            self._fire_callbacks()
 
         _LOGGER.debug(
             "%s: Notification received; RSSI: %s: %s %s",
