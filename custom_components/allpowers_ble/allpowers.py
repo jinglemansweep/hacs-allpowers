@@ -260,6 +260,8 @@ class AllpowersBLE:
 
         self._buf += data
 
+        if len(data) <= 14: return
+
         battery_percentage = data[8]
         dc_on = data[7] >> 0 & 1 == 1
         ac_on = data[7] >> 1 & 1 == 1
